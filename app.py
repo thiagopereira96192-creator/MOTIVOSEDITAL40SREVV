@@ -14,7 +14,7 @@ import os
 import requests
 
 DATA_PATH = Path(__file__).parent / "data" / "MOTIVOSEDITAL40SREVV.xlsx"
-URL = "https://drive.google.com/drive/u/1/folders/1qADGbu3zzKJXpDx3ksmh55La0xVNGIS7"
+URL = "https://docs.google.com/spreadsheets/d/1EzkHvoDCjm2H_m6m-RYmvhk5TYbWPeIM/edit?usp=sharing&ouid=110381490637167407256&rtpof=true&sd=true"
 
 def baixar_base():
     data_dir = DATA_PATH.parent
