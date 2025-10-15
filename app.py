@@ -71,6 +71,13 @@ def try_load_default() -> pd.DataFrame | None:
 # ============ Carregamento (com persistência) ============
 st.title("🔍 MVP — Indeferimentos (Edital 40/2024 SREVV)")
 st.caption("Fonte padrão: Google Sheets CSV + upload opcional. Cache + session_state ativados.")
+st.markdown(
+    """
+    Este painel apresenta uma visão dos dados referentes ao Edital 40/2024 da SREVV, 
+    permitindo identificar padrões, categorias com maior incidência de indeferimentos e distribuição 
+    das informações por variáveis como **Situação**, **Motivo**, **Disciplina** e **Município**.  
+    """
+)
 
 # Inicializa sessão
 if "df" not in st.session_state:
