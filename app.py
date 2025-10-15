@@ -8,6 +8,9 @@ MVP • Estatística descritiva + Gráfico (MOTIVOSEDITAL40SREVV.xlsx)
 from pathlib import Path
 import pandas as pd
 import streamlit as st
+git add data/MOTIVOSEDITAL40SREVV.xlsx
+git commit -m "Adiciona base de dados Excel ao repositório"
+git push
 
 st.set_page_config(page_title="MVP SREVV 40/2024 • Motivos", page_icon="📊", layout="wide")
 st.title("📊 MVP — Motivos Edital 40/2024 (SREVV)")
