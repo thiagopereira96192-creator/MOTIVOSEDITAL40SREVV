@@ -8,19 +8,19 @@ MVP • Estatística descritiva + Gráfico (MOTIVOSEDITAL40SREVV.xlsx)
 from pathlib import Path
 import pandas as pd
 import streamlit as st
-
-
+import os
+import requests
 import os
 import requests
 
-DATA_PATH = "data/MOTIVOSEDITAL40SREVV.xlsx"
-URL = "COLE_AQUI_O_LINK_DIRETO_DO_ARQUIVO"
+DATA_PATH = Path(__file__).parent / "data" / "MOTIVOSEDITAL40SREVV.xlsx"
+URL = "https://drive.google.com/drive/u/1/folders/1qADGbu3zzKJXpDx3ksmh55La0xVNGIS7"
 
 def baixar_base():
-    # Só cria a pasta se ela não existir como diretório
-    if not os.path.isdir("data"):
-        os.makedirs("data", exist_ok=True)
-    if not os.path.exists(DATA_PATH):
+    data_dir = DATA_PATH.parent
+    if not data_dir.is_dir():
+        data_dir.mkdir(parents=True, exist_ok=True)
+    if not DATA_PATH.exists():
         r = requests.get(URL)
         with open(DATA_PATH, "wb") as f:
             f.write(r.content)
