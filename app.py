@@ -114,18 +114,18 @@ if df is None:
     st.warning("Nenhuma base carregada ainda. Verifique a URL do Google Sheets ou envie um arquivo.")
     st.stop()
 
-st.subheader("🔎 Prévia da base")
+st.subheader("🔎 base de dados")
 st.write(f"**Registros:** {len(df)} • **Colunas:** {', '.join(map(str, df.columns))}")
 st.dataframe(df.head(30), use_container_width=True)
 
-st.subheader("📈 Tabela descritiva (pandas `describe`)")
+st.subheader("📈 📊 Dados gerais do Edital 40/2024 da SREVV")
 try:
     desc = df.describe(include="all", datetime_is_numeric=True).transpose()
 except TypeError:
     desc = df.describe(include="all").transpose()
 st.dataframe(desc, use_container_width=True)
 
-st.subheader("📊 Gráfico de barras — OBRIGATÓRIO")
+st.subheader("📊 Total de Eliminados e Reclassificados do Edital 40/2024 da SREVV")
 cat_cols = [c for c in df.columns if df[c].dtype == "object" or str(df[c].dtype).startswith("category")]
 with st.sidebar:
     st.header("⚙️ Configurar gráfico")
