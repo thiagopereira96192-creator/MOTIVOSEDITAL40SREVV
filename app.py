@@ -1,10 +1,8 @@
 
-MVP • Estatística descritiva + Gráfico (MOTIVOSEDITAL40SREVV.xlsx)
-"""
+
 from pathlib import Path
 import pandas as pd
 import streamlit as st
-
 
 DATA_PATH = Path(__file__).parent / "data" / "MOTIVOSEDITAL40SREVV.xlsx"
 
