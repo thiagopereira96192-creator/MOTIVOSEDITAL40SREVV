@@ -126,6 +126,13 @@ except TypeError:
 st.dataframe(desc, use_container_width=True)
 
 st.subheader("📊 Total de Eliminados e Reclassificados do Edital 40/2024 da SREVV")
+st.markdown(
+    """
+    ℹ️ **Contexto da visualização:**  
+    Este gráfico permite analisar a distribuição dos registros do Edital 40/2024 da SREVV com base em diferentes categorias da base de dados, 
+    como **Situação**, **Motivo**, **Disciplina** ou **Município**.  
+    """
+)
 cat_cols = [c for c in df.columns if df[c].dtype == "object" or str(df[c].dtype).startswith("category")]
 with st.sidebar:
     st.header("⚙️ Selecione as opções desejadas para gerar o gráfico")
