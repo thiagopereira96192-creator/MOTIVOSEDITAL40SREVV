@@ -1,50 +1,73 @@
 
 
 from pathlib import Path
+from io import BytesIO
 import pandas as pd
 import streamlit as st
 
 DATA_PATH = Path(__file__).parent / "data" / "MOTIVOSEDITAL40SREVV.xlsx"
 
-@st.cache_data
-def _read_any(file, sheet=0):
-    name = getattr(file, "name", None)
-    if isinstance(file, (str, Path)):
-        p = Path(file)
-        if p.suffix.lower() in [".xlsx", ".xls"]:
-            return pd.read_excel(p, sheet_name=sheet)
-        elif p.suffix.lower() == ".csv":
-            return pd.read_csv(p)
-    # UploadedFile (buffer)
-    if name and name.lower().endswith((".xlsx", ".xls")):
-        return pd.read_excel(file, sheet_name=sheet)
+# ---------- Funções de leitura com cache estável ----------
+@st.cache_data(show_spinner="Lendo arquivo do disco…")
+def _read_from_path(path_str: str, sheet=0):
+    p = Path(path_str)
+    suf = p.suffix.lower()
+    if suf in (".xlsx", ".xls"):
+        return pd.read_excel(p, sheet_name=sheet)
+    elif suf == ".csv":
+        return pd.read_csv(p)
     else:
-        return pd.read_csv(file)
+        raise ValueError(f"Extensão não suportada: {suf}")
+
+@st.cache_data(show_spinner="Lendo arquivo enviado…")
+def _read_from_bytes(data: bytes, ext: str, sheet=0):
+    ext = ext.lower()
+    bio = BytesIO(data)
+    if ext in (".xlsx", ".xls"):
+        return pd.read_excel(bio, sheet_name=sheet)
+    elif ext == ".csv":
+        return pd.read_csv(bio)
+    else:
+        raise ValueError(f"Extensão não suportada: {ext}")
+
+def _clean_columns(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df.columns = [str(c).strip() for c in df.columns]
+    for c in df.columns:
+        if df[c].dtype == "object":
+            df[c] = df[c].astype(str).str.strip()
+    return df
 
 def try_load_default():
     try:
         if DATA_PATH.exists():
-            df = _read_any(DATA_PATH, sheet=0)
-            df.columns = [c.strip() for c in df.columns]
-            for c in df.columns:
-                if df[c].dtype == "object":
-                    df[c] = df[c].astype(str).str.strip()
+            df = _read_from_path(str(DATA_PATH), sheet=0)
+            df = _clean_columns(df)
             st.success(f"Base carregada automaticamente de: {DATA_PATH.name}")
             return df
     except Exception as e:
         st.warning(f"Falha ao carregar o arquivo padrão: {e}")
     return None
 
-df = try_load_default()
+# ============== Persistência na sessão ==============
+if "df" not in st.session_state:
+    st.session_state.df = try_load_default()
 
 st.subheader("📂 Upload (opcional)")
 up = st.file_uploader("Envie um .xlsx/.xls ou .csv", type=["xlsx","xls","csv"])
-if df is None and up is not None:
+
+# Se o usuário enviar arquivo, lê uma única vez e guarda em session_state
+if up is not None:
     try:
-        df = _read_any(up, sheet=0)
-        st.success("Arquivo enviado carregado com sucesso.")
+        file_bytes = up.getvalue()  # bytes estáveis para cache
+        file_ext = Path(up.name).suffix
+        df_up = _read_from_bytes(file_bytes, file_ext, sheet=0)
+        st.session_state.df = _clean_columns(df_up)
+        st.success(f"Arquivo '{up.name}' carregado e mantido na sessão.")
     except Exception as e:
         st.error(f"Não consegui ler o arquivo enviado: {e}")
+
+df = st.session_state.df
 
 if df is None:
     st.info("Nenhuma base carregada ainda. Coloque o arquivo em `data/MOTIVOSEDITAL40SREVV.xlsx` ou faça upload acima.")
@@ -52,7 +75,7 @@ if df is None:
 
 # ----------------- Prévia -----------------
 st.subheader("🔎 Prévia da base")
-st.write(f"**Registros:** {len(df)}  •  **Colunas:** {', '.join(df.columns)}")
+st.write(f"**Registros:** {len(df)}  •  **Colunas:** {', '.join(map(str, df.columns))}")
 st.dataframe(df.head(30), use_container_width=True)
 
 # ----------------- Tabela Descritiva (Obrigatório 1) -----------------
@@ -71,13 +94,11 @@ cat_cols = [c for c in df.columns if df[c].dtype == "object" or str(df[c].dtype)
 
 with st.sidebar:
     st.header("⚙️ Configurar gráfico")
-    x_col = st.selectbox("Eixo X (categórica)", options=cat_cols if cat_cols else df.columns, index=0, key="bar_x")
+    x_col = st.selectbox("Eixo X (categórica)", options=cat_cols if cat_cols else list(df.columns), index=0, key="bar_x")
     group_by = st.selectbox("Quebrar por (opcional)", options=["(sem quebra)"] + cat_cols, index=0, key="bar_group")
 
-# Agrupar por contagem (base é categórica)
 if group_by != "(sem quebra)":
     grouped = df.groupby([x_col, group_by], dropna=False).size().reset_index(name="contagem")
-    # pivot para barras agrupadas
     pivot = grouped.pivot(index=x_col, columns=group_by, values="contagem").fillna(0)
     st.bar_chart(pivot, use_container_width=True)
     with st.expander("Ver dados agregados"):
