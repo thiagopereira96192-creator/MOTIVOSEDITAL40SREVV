@@ -8,7 +8,20 @@ MVP • Estatística descritiva + Gráfico (MOTIVOSEDITAL40SREVV.xlsx)
 from pathlib import Path
 import pandas as pd
 import streamlit as st
+import os
+import requests
 
+DATA_PATH = "data/MOTIVOSEDITAL40SREVV.xlsx"
+URL = "https://docs.google.com/spreadsheets/d/1EzkHvoDCjm2H_m6m-RYmvhk5TYbWPeIM/edit?gid=1431763071#gid=1431763071"
+
+def baixar_base():
+    if not os.path.exists(DATA_PATH):
+        os.makedirs("data", exist_ok=True)
+        r = requests.get(URL)
+        with open(DATA_PATH, "wb") as f:
+            f.write(r.content)
+
+baixar_base()
 
 
 st.set_page_config(page_title="MVP SREVV 40/2024 • Motivos", page_icon="📊", layout="wide")
