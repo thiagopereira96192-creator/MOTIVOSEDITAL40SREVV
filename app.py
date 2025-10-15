@@ -1,36 +1,10 @@
 
-# -*- coding: utf-8 -*-
-"""
 MVP • Estatística descritiva + Gráfico (MOTIVOSEDITAL40SREVV.xlsx)
-- Obrigatório 1: Tabela descritiva da base usada (pandas describe)
-- Obrigatório 2: Um gráfico (barras) a sua escolha
 """
 from pathlib import Path
 import pandas as pd
 import streamlit as st
-import os
-import requests
-import os
-import requests
 
-DATA_PATH = Path(__file__).parent / "data" / "MOTIVOSEDITAL40SREVV.xlsx"
-URL = "https://docs.google.com/spreadsheets/d/1EzkHvoDCjm2H_m6m-RYmvhk5TYbWPeIM/edit?usp=sharing&ouid=110381490637167407256&rtpof=true&sd=true"
-
-def baixar_base():
-    data_dir = DATA_PATH.parent
-    # Só cria se não for diretório
-    if not data_dir.exists():
-        data_dir.mkdir(parents=True, exist_ok=True)
-    elif not data_dir.is_dir():
-        raise RuntimeError(f"'{data_dir}' existe, mas não é um diretório!")
-    if not DATA_PATH.exists():
-        r = requests.get(URL)
-        with open(DATA_PATH, "wb") as f:
-            f.write(r.content)
-
-st.set_page_config(page_title="MVP SREVV 40/2024 • Motivos", page_icon="📊", layout="wide")
-st.title("📊 MVP — Motivos Edital 40/2024 (SREVV)")
-st.caption("Base padrão: data/MOTIVOSEDITAL40SREVV.xlsx • Se não existir, faça upload abaixo.")
 
 DATA_PATH = Path(__file__).parent / "data" / "MOTIVOSEDITAL40SREVV.xlsx"
 
@@ -62,11 +36,6 @@ def try_load_default():
     except Exception as e:
         st.warning(f"Falha ao carregar o arquivo padrão: {e}")
     return None
-
-with st.sidebar:
-    st.header("ℹ️ Informações")
-    st.write("Arquivo esperado: `data/MOTIVOSEDITAL40SREVV.xlsx`")
-    st.write("Caso não exista, use o upload abaixo.")
 
 df = try_load_default()
 
