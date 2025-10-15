@@ -128,9 +128,9 @@ st.dataframe(desc, use_container_width=True)
 st.subheader("📊 Total de Eliminados e Reclassificados do Edital 40/2024 da SREVV")
 cat_cols = [c for c in df.columns if df[c].dtype == "object" or str(df[c].dtype).startswith("category")]
 with st.sidebar:
-    st.header("⚙️ Configurar gráfico")
-    x_col = st.selectbox("Eixo X (categórica)", options=cat_cols if cat_cols else list(df.columns), index=0, key="bar_x")
-    group_by = st.selectbox("Quebrar por (opcional)", options=["(sem quebra)"] + cat_cols, index=0, key="bar_group")
+    st.header("⚙️ Selecione as opções desejadas para gerar o gráfico")
+    x_col = st.selectbox("Categoria (categórica)", options=cat_cols if cat_cols else list(df.columns), index=0, key="bar_x")
+    group_by = st.selectbox("Opção (opcional)", options=["(sem quebra)"] + cat_cols, index=0, key="bar_group")
 
 if group_by != "(sem quebra)":
     grouped = df.groupby([x_col, group_by], dropna=False).size().reset_index(name="contagem")
