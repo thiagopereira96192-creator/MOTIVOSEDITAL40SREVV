@@ -18,15 +18,15 @@ URL = "https://drive.google.com/drive/u/1/folders/1qADGbu3zzKJXpDx3ksmh55La0xVNG
 
 def baixar_base():
     data_dir = DATA_PATH.parent
-    if not data_dir.is_dir():
+    # Só cria se não for diretório
+    if not data_dir.exists():
         data_dir.mkdir(parents=True, exist_ok=True)
+    elif not data_dir.is_dir():
+        raise RuntimeError(f"'{data_dir}' existe, mas não é um diretório!")
     if not DATA_PATH.exists():
         r = requests.get(URL)
         with open(DATA_PATH, "wb") as f:
             f.write(r.content)
-
-baixar_base()
-
 
 st.set_page_config(page_title="MVP SREVV 40/2024 • Motivos", page_icon="📊", layout="wide")
 st.title("📊 MVP — Motivos Edital 40/2024 (SREVV)")
